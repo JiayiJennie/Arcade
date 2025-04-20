@@ -1,4 +1,4 @@
-# Arcade: ctivation Engineering for Controllable Codon Design
+# Arcade: Activation Engineering for Controllable Codon Design
 
 This repository extends CodonBERT[*CodonBERT: large language models for mRNA design and optimization*](https://www.biorxiv.org/content/10.1101/2023.09.09.556981v1) with our framework — Arcade — for controllable codon design using activation engineering and semantic steering.
 
