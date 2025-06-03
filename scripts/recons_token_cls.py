@@ -1,5 +1,6 @@
 """
-This script is used to steer the freezed model towards a specific optimization goal given input sequences.
+This script performs guided mutation on input sequences to achieve a specific optimization objective,
+by leveraging a frozen model for steering.
 """
 
 import os
@@ -22,58 +23,46 @@ from Bio import SeqIO
 from peft import PeftModel, PeftConfig
 
 import sys
-sys.path.append("/mnt/disk90/user/jiayili/calculator")
+sys.path.append("../calculator")
 from calculator import mfe_calculation, cai_calculation, cpb_calculation
 from calculator import CpG_density as cpg_calculation
 from calculator import UpA_density as upa_calculation
 
-sys.path.append("/mnt/disk90/user/jiayili/CodonBERT/benchmarks/utils")
+sys.path.append("../benchmarks/CodonBERT/benchmarks/utils")
 from tokenizer import get_tokenizer, mytok
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device:", device)
 
 
-
 parser = argparse.ArgumentParser()
-parser.add_argument("--model_path", type=str, default='/mnt/disk90/user/jiayili/codon_optimization_steering/saved_model/2025-03-24-23-38-02/best_model', help="Path to the pretrained model directory.")
-parser.add_argument("--data_path", type=str, default='/mnt/disk90/user/jiayili/GENCODE/gencode.v47.pc_transcripts_cds_3072_test.fa', help="Path to the FASTA data.")
-parser.add_argument("--cai_mfe_table_path", type=str, default='/mnt/disk90/user/jiayili/GENCODE/gencode.v47.pc_transcripts_cds_3072_test.csv', help="Path to the table of CAI and MFE values.")
-parser.add_argument("--mfe_steering_vectors_path", type=str, default='/mnt/disk90/user/jiayili/codon_optimization_steering/data/steering_vectors_mfe.npy', help="Path to the MFE steering vectors .npy file.")
-parser.add_argument("--cai_steering_vectors_path", type=str, default='/mnt/disk90/user/jiayili/codon_optimization_steering/data/steering_vectors_cai.npy', help="Path to the CAI steering vectors .npy file.")
-parser.add_argument("--gc_steering_vectors_path", type=str, default='/mnt/disk90/user/jiayili/codon_optimization_steering/data/steering_vectors_gc.npy', help="Path to the GC content steering vectors .npy file.")
-parser.add_argument("--cpb_steering_vectors_path", type=str, default='/mnt/disk90/user/jiayili/codon_optimization_steering/data/steering_vectors_cpb.npy', help="Path to the CPB steering vectors .npy file.")
-parser.add_argument("--liver_steering_vectors_path", type=str, default='/mnt/disk90/user/jiayili/codon_optimization_steering/data/steering_vectors_liver_normal.npy', help="Path to the liver steering vectors .npy file.")
-parser.add_argument("--hepatocellular_vectors_path", type=str, default='/mnt/disk90/user/jiayili/codon_optimization_steering/data/steering_vectors_hepatocellular.npy', help="Path to the Hepatocellular vector .npy file.")
-parser.add_argument("--mRFP_steering_vectors_path", type=str, default='/mnt/disk90/user/jiayili/codon_optimization_steering/data/steering_vectors_mRFP.npy', help="Path to the mRFP steering vectors .npy file.")
-parser.add_argument("--cpg_steering_vectors_path", type=str, default='/mnt/disk90/user/jiayili/codon_optimization_steering/data/steering_vectors_cpg.npy', help="Path to the CpG steering vectors .npy file.")
-parser.add_argument("--upa_steering_vectors_path", type=str, default='/mnt/disk90/user/jiayili/codon_optimization_steering/data/steering_vectors_upa.npy', help="Path to the UpA steering vectors .npy file.")
+parser.add_argument("--model_path", type=str, default='../checkpoint', help="Path to the pretrained model directory.")
+parser.add_argument("--data_path", type=str, default='../data/GENCODE/gencode.v47.pc_transcripts_cds_test.fa', help="Path to the FASTA data.")
+parser.add_argument("--mfe_steering_vectors_path", type=str, default='../data/vectors/steering_vectors_mfe.npy', help="Path to the MFE steering vectors .npy file.")
+parser.add_argument("--cai_steering_vectors_path", type=str, default='../data/vectors/steering_vectors_cai.npy', help="Path to the CAI steering vectors .npy file.")
+parser.add_argument("--gc_steering_vectors_path", type=str, default='../data/vectors/steering_vectors_gc.npy', help="Path to the GC content steering vectors .npy file.")
+parser.add_argument("--mRFP_steering_vectors_path", type=str, default='../data/vectors/steering_vectors_mRFP.npy', help="Path to the mRFP steering vectors .npy file.")
+parser.add_argument("--cpg_steering_vectors_path", type=str, default='../data/vectors/steering_vectors_cpg.npy', help="Path to the CpG steering vectors .npy file.")
+parser.add_argument("--upa_steering_vectors_path", type=str, default='../codon_optimization_steering/vectors/data/steering_vectors_upa.npy', help="Path to the UpA steering vectors .npy file.")
 parser.add_argument("--steering_strength", type=float, default=1, help="Scaling factor for the steering vectors.")
 parser.add_argument("--lambda_mfe", type=float, default=0, help="Weight for the MFE steering vectors.")
 parser.add_argument("--lambda_cai", type=float, default=0, help="Weight for the CAI steering vectors.")
 parser.add_argument("--lambda_gc", type=float, default=0, help="Weight for the GC content steering vectors.")
-parser.add_argument("--lambda_cpb", type=float, default=0, help="Weight for the CPB steering vectors.")
-parser.add_argument("--lambda_liver", type=float, default=0, help="Weight for the liver steering vectors.")
-parser.add_argument("--lambda_hepa", type=float, default=0, help="Weight for the Hepatocellular steering vectors.")
 parser.add_argument("--lambda_mRFP", type=float, default=0, help="Weight for the mRFP steering vectors.")
 parser.add_argument("--lambda_cpg", type=float, default=0, help="Weight for the CpG steering vectors.")
 parser.add_argument("--lambda_upa", type=float, default=0, help="Weight for the UpA steering vectors.")
 parser.add_argument("--batch_size", type=int, default=64, help="Batch size for evaluation.")
 parser.add_argument("--single_example", action="store_true", help="Whether to evaluate a single example.")
 parser.add_argument("--input_example", type=str, default=None, help="Input example to evaluate.")
-parser.add_argument("--save_dir", type=str, default="/mnt/disk90/user/jiayili/codon_optimization_steering/results/", help="Directory to save the optimized sequences.")
+parser.add_argument("--save_dir", type=str, default="../results/", help="Directory to save the optimized sequences.")
 parser.add_argument("--save_file_name", type=str, default="results")
 args = parser.parse_args()
 
 model_path = args.model_path
 data_path = args.data_path
-cai_mfe_table_path = args.cai_mfe_table_path
 MFE_steering_vectors_path = args.mfe_steering_vectors_path
 CAI_steering_vectors_path = args.cai_steering_vectors_path
 GC_steering_vectors_path = args.gc_steering_vectors_path
-CPB_steering_vectors_path = args.cpb_steering_vectors_path
-liver_steering_vectors_path = args.liver_steering_vectors_path
-hepatocellular_vectors_path = args.hepatocellular_vectors_path
 mRFP_steering_vectors_path = args.mRFP_steering_vectors_path
 
 steering_strength = args.steering_strength
@@ -144,17 +133,14 @@ tokenized_test = ds_test.map(tokenize_and_align_labels_fn, batched=True)
 mfe_steering_vectors = torch.tensor(np.load(MFE_steering_vectors_path)).to(device)
 cai_steering_vectors = torch.tensor(np.load(CAI_steering_vectors_path)).to(device)
 gc_steering_vectors = torch.tensor(np.load(GC_steering_vectors_path)).to(device)
-cpb_steering_vectors = torch.tensor(np.load(CPB_steering_vectors_path)).to(device)
-liver_steering_vectors = torch.tensor(np.load(liver_steering_vectors_path)).to(device)
 mRFP_steering_vectors = torch.tensor(np.load(mRFP_steering_vectors_path)).to(device)
-hepatocellular_steering_vectors = torch.tensor(np.load(hepatocellular_vectors_path)).to(device)
 cpg_steering_vectors = torch.tensor(np.load(args.cpg_steering_vectors_path)).to(device)
 upa_steering_vectors = torch.tensor(np.load(args.upa_steering_vectors_path)).to(device)
 steering_vectors = - lambda1 * mfe_steering_vectors + lambda2 * cai_steering_vectors \
-    + lambda_gc * gc_steering_vectors + lambda_cpb * cpb_steering_vectors \
-    + lambda_liver * liver_steering_vectors + lambda_hepatocellular * hepatocellular_steering_vectors\
-    + lambda_mRFP * mRFP_steering_vectors\
-    + lambda_cpg * cpg_steering_vectors + lambda_upa * upa_steering_vectors
+    + lambda_gc * gc_steering_vectors \
+    + lambda_cpg * cpg_steering_vectors + lambda_upa * upa_steering_vectors \
+    + lambda_mRFP * mRFP_steering_vectors
+    
 
 
 def create_synonymous_mask(logits, labels, label2id=label2id, id2label=id2label):
@@ -300,9 +286,7 @@ else:
         p = [id2label[pred] for pred in p]
         preds.append("".join(p))
 
-    # df = pd.read_csv(cai_mfe_table_path)
     time_str = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
-    # save_path = os.path.join(save_dir, f"gencode.v47.pc_transcripts_cds_test_pred_{time_str}_{lambda1}_{lambda2}_gc{lambda_gc}_cpb{lambda_cpb}_liver{lambda_liver}_hepa{lambda_hepatocellular}.fa")
     save_file_name = args.save_file_name
     save_path = os.path.join(save_dir, f"{time_str}_{save_file_name}.fa")
 
