@@ -37,3 +37,11 @@ Run the script as follows:
 ```bash
 python fetch_GENCODE.py -i gencode.v47.pc_transcripts.fa -o gencode.v47.pc_transcripts_cds.fa
 ```
+
+### Dataset Preprocessing Notes
+
+1. We filter out CDS sequences longer than 3,072 nucleotides due to the maximum input length constraint of the base model, CodonBERT.
+
+2. The dataset is split into training and testing sets at a 9:1 ratio. To avoid information leakage, all transcript variants belonging to the same gene are assigned to the same split.
+
+3. The test dataset is located at: `data/GENCODE/gencode.v47.pc_transcripts_cds_test.fa`
