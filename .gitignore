@@ -170,6 +170,5 @@ cython_debug/
 mrna_models/
 *.model
 *.pkl
-*.npy
 *.pt
 .hydra
