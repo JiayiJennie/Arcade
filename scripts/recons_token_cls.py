@@ -3,7 +3,6 @@ This script is used to steer the freezed model towards a specific optimization g
 """
 
 import os
-# os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 import time
 import torch
 
