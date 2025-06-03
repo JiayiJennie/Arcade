@@ -15,13 +15,7 @@ import os
 sys.path.append("/mnt/disk90/user/jiayili/CodonBERT/benchmarks/utils")
 from tokenizer import mytok, get_tokenizer
 
-# mfe_cai_table_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/gencode.v47.pc_transcripts_cds_caimfe_table_train.csv'
-# mfe_cai_table_path = '/mnt/disk90/user/jiayili/calculator/result/gencode.v47.pc_transcripts_cds_3072_train_caimfe_table.csv'
-model_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/saved_model/2025-03-24-23-38-02/best_model'
-
-# data_path = '/mnt/disk90/rnadesigndata/GENCODE/gencode.v47.pc_transcripts_cds_2048_train.fa'
-# data_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/gencode.v47.pc_transcripts_cds_train.fa'
-# data_path = '/mnt/disk90/user/jiayili/GENCODE/gencode.v47.pc_transcripts_cds_3072.fa'
+model_path = '../chckpoints'
 
 def encode_sequences(sequences, tokenizer, max_length=1024):
     tokenized_sequences = [" ".join(mytok(seq, 3, 3)) for seq in sequences]
@@ -146,59 +140,27 @@ def load_data(data_path):
     return sequences
 
 if __name__ == "__main__":
-    # 2std
-    # top_cai_threshold = 0.872      #703
-    # bottom_cai_threshold = 0.682   #607
-    # 3std
-    # top_cai_threshold = 0.906     #50
-    # bottom_cai_threshold = 0.648  #49
-
-    # sequences = load_data(data_path)
-    # print(f"Loaded {len(sequences)} sequences") 
+    lambda_ = 0
+    percent = 0.01
+    high_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/for_steering/high_upa.fa'
+    low_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/for_steering/low_upa.fa'
+    save_name = 'upa'
+    data_type = 'fasta'
+    save_dir = '/mnt/disk90/user/jiayili/codon_optimization_steering/data'
 
     tokenizer = get_tokenizer()
-
     device = torch.device("cuda:0")
-
     config = PeftConfig.from_pretrained(model_path)
     model, bert_tokenizer_fast, _, _ = load_model(model_path=config.base_model_name_or_path)
     model = PeftModel.from_pretrained(model, model_path)
     model=model.merge_and_unload()
     model.to(device)
 
-    # steering_vectors = fatch_steering_vector('cai', sequences, model, bert_tokenizer_fast, device, top_cai_threshold=top_cai_threshold, bottom_cai_threshold=bottom_cai_threshold)
-    lambda_ = 0
-    percent = 0.01
-    # steering_vectors = fatch_steering_vector(data_type, sequences, model, bert_tokenizer_fast, device, percent=0.01)
-    # steering_vectors = fatch_steering_vector(data_type, sequences, model, bert_tokenizer_fast, device, percent=0.01)
-    # steering_vectors = fatch_steering_vector(data_type, sequences, model, bert_tokenizer_fast, device, percent=percent, lambda_=lambda_)
-    # steering_vectors = fetch_steering_vector(data_type, sequences, model, bert_tokenizer_fast, device, percent=percent)
-    # high_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/for_steering/high_cai_sequences.fa'
-    # low_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/for_steering/low_cai_sequences.fa'
-    # high_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/for_steering/high_mfe_sequences_perturbation.fa'
-    # low_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/for_steering/low_mfe_sequences_lineardesign.fa'
-    # high_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/bins/bin_2170-2479/high_mfe_sequences.fa'
-    # low_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/bins/bin_2170-2479/low_mfe_sequences.fa'
-    # high_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/bins/bin_930-1239/high_mfe_sequences.fa'
-    # low_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/bins/bin_930-1239/low_mfe_sequences.fa'
-    # high_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/for_steering/high_gc_sequences.fa'
-    # low_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/for_steering/low_gc_sequences.fa'
-    # high_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/for_steering/high_cai_hepatocellular.fa'
-    # low_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/for_steering/low_cai_hepatocellular.fa'
-    # high_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/for_steering/high_mRFP_sequences.fa'
-    # low_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/for_steering/low_mRFP_sequences.fa'
-    high_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/for_steering/high_upa.fa'
-    low_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/for_steering/low_upa.fa'
-    save_name = 'upa'
-    data_type = 'fasta'
     steering_vectors = fetch_steering_vector(data_type, model, bert_tokenizer_fast, device, high_fa_path=high_fa_path, low_fa_path=low_fa_path)
 
     print(steering_vectors.shape) # n_layers, 1, max_len, emb_size
     
-    # save_dir = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/bins/bin_2170-2479'
-    save_dir = '/mnt/disk90/user/jiayili/codon_optimization_steering/data'
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
-    # np.save(os.path.join(save_dir, data_type+'_steering_vectors_'+str(percent)+'_full.npy'), steering_vectors)
     np.save(os.path.join(save_dir, 'steering_vectors_'+save_name+'.npy'), steering_vectors)
     print("Saved steering vectors to", os.path.join(save_dir, 'steering_vectors_'+save_name+'.npy'))

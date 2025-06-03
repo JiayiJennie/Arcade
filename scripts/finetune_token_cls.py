@@ -58,7 +58,7 @@ def compute_metrics(pred):
     """
     Compute the metrics.
     """
-    metric = evaluate.load("evaluate/metrics/accuracy/accuracy.py")  
+    metric = evaluate.load("../evaluate/metrics/accuracy/accuracy.py")  
     logits, labels = pred
     predictions = np.argmax(logits, axis=-1)  
     
@@ -82,11 +82,11 @@ if __name__ == "__main__":
     print("Using device:", device)
 
     parser = argparse.ArgumentParser(description="Fine-tune CodonBERT for token classification.")
-    parser.add_argument('--model_dir', type=str, default='/mnt/disk90/user/jiayili/codon_optimization_steering/saved_model', help='Directory to save the fine-tuned model.')
-    parser.add_argument('--data_path', type=str, default='/mnt/disk90/user/jiayili/GENCODE/gencode.v47.pc_transcripts_cds_3072_train.fa',
+    parser.add_argument('--model_dir', type=str, default='../checkpoint', help='Directory to save the fine-tuned model.')
+    parser.add_argument('--data_path', type=str, default='path/to/your/train/data.fa',
                         help='Path to the FASTA data for training.')
-    parser.add_argument('--model_path', type=str, default='/mnt/disk90/user/jiayili/CodonBERT/ckpt',
-                        help='Path to the pretrained model directory. This should be a CodonBERT checkpoint.')
+    parser.add_argument('--model_path', type=str, default='../benchmarks/CodonBERT/codonbert',
+                        help='Path to the pretrained CodonBERT model. You can download the checkpoint following the instructions in the README.md file.')
     parser.add_argument('--max_length', type=int, default=1024, help='Maximum sequence length for tokenization. Default is 1024.')
     parser.add_argument('--hidden_size', type=int, default=768, help='Hidden size of the model.')
     parser.add_argument('--inter_size', type=int, default=3072, help='Intermediate size of the model.')
