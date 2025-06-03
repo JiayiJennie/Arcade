@@ -1,7 +1,7 @@
 {
   "alpha_pattern": {},
   "auto_mapping": null,
-  "base_model_name_or_path": "/mnt/disk90/user/jiayili/CodonBERT_sanofi/ckpt",
+  "base_model_name_or_path": "[Path to the downloaded CodonBERT checkpoint]",
   "bias": "none",
   "fan_in_fan_out": false,
   "inference_mode": true,

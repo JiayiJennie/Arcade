@@ -1,6 +1,6 @@
 ---
 library_name: peft
-base_model: /mnt/disk90/user/jiayili/CodonBERT/ckpt
+base_model: [Path to the downloaded CodonBERT checkpoint]
 ---
 
 # Model Card for Model ID
