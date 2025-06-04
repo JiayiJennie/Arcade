@@ -50,6 +50,18 @@ sed -i 's|"base_model_name_or_path": *".*"|"base_model_name_or_path": "'"$(realp
 
 ```bash
 cd ../scripts
+```
+
+If you only want to see one sequence:
+```bash
+CUDA_VISIBLE_DEVICES=0 python -u recons_token_cls.py \
+  --lambda_gc 1 \
+  --single_example \
+  --input_example ATGCCA
+```
+
+Use the test data at `data/GENCODE/gencode.v47.pc_transcripts_cds_test.fa`
+```bash
 CUDA_VISIBLE_DEVICES=0 python -u recons_token_cls.py \
   --lambda_cai 1 \
   --save_file_name 'cai' 
@@ -63,13 +75,7 @@ CUDA_VISIBLE_DEVICES=0 python -u recons_token_cls.py \
   --save_file_name 'cai+gc' 
 ```
 
-If you only want to see one sequence:
-```bash
-CUDA_VISIBLE_DEVICES=0 python -u recons_token_cls.py \
-  --lambda_gc 1 \
-  --single_example \
-  --input_example ATGCCA
-```
+
 
 If you want to use your own data and base model to get started, you can train the token classification head and generate steering vectors using the following commands:
 
