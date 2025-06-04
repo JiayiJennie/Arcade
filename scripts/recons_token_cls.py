@@ -36,14 +36,14 @@ print("Using device:", device)
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--model_path", type=str, default='../checkpoint', help="Path to the pretrained model directory.")
+parser.add_argument("--model_path", type=str, default='../checkpoint/arcade', help="Path to the pretrained model directory.")
 parser.add_argument("--data_path", type=str, default='../data/GENCODE/gencode.v47.pc_transcripts_cds_test.fa', help="Path to the FASTA data.")
-parser.add_argument("--mfe_steering_vectors_path", type=str, default='../data/vectors/steering_vectors_mfe.npy', help="Path to the MFE steering vectors .npy file.")
-parser.add_argument("--cai_steering_vectors_path", type=str, default='../data/vectors/steering_vectors_cai.npy', help="Path to the CAI steering vectors .npy file.")
-parser.add_argument("--gc_steering_vectors_path", type=str, default='../data/vectors/steering_vectors_gc.npy', help="Path to the GC content steering vectors .npy file.")
-parser.add_argument("--mRFP_steering_vectors_path", type=str, default='../data/vectors/steering_vectors_mRFP.npy', help="Path to the mRFP steering vectors .npy file.")
-parser.add_argument("--cpg_steering_vectors_path", type=str, default='../data/vectors/steering_vectors_cpg.npy', help="Path to the CpG steering vectors .npy file.")
-parser.add_argument("--upa_steering_vectors_path", type=str, default='../codon_optimization_steering/vectors/data/steering_vectors_upa.npy', help="Path to the UpA steering vectors .npy file.")
+parser.add_argument("--mfe_steering_vectors_path", type=str, default='../data/steering_vectors/steering_vectors_mfe.npy', help="Path to the MFE steering vectors .npy file.")
+parser.add_argument("--cai_steering_vectors_path", type=str, default='../data/steering_vectors/steering_vectors_cai.npy', help="Path to the CAI steering vectors .npy file.")
+parser.add_argument("--gc_steering_vectors_path", type=str, default='../data/steering_vectors/steering_vectors_gc.npy', help="Path to the GC content steering vectors .npy file.")
+parser.add_argument("--mRFP_steering_vectors_path", type=str, default='../data/steering_vectors/steering_vectors_mRFP.npy', help="Path to the mRFP steering vectors .npy file.")
+parser.add_argument("--cpg_steering_vectors_path", type=str, default='../data/steering_vectors/steering_vectors_cpg.npy', help="Path to the CpG steering vectors .npy file.")
+parser.add_argument("--upa_steering_vectors_path", type=str, default='../data/steering_vectors/steering_vectors_upa.npy', help="Path to the UpA steering vectors .npy file.")
 parser.add_argument("--steering_strength", type=float, default=1, help="Scaling factor for the steering vectors.")
 parser.add_argument("--lambda_mfe", type=float, default=0, help="Weight for the MFE steering vectors.")
 parser.add_argument("--lambda_cai", type=float, default=0, help="Weight for the CAI steering vectors.")
@@ -69,24 +69,20 @@ steering_strength = args.steering_strength
 lambda1 = args.lambda_mfe
 lambda2 = args.lambda_cai
 lambda_gc = args.lambda_gc
-lambda_cpb = args.lambda_cpb
-lambda_liver = args.lambda_liver
-lambda_hepatocellular = args.lambda_hepa
 lambda_mRFP = args.lambda_mRFP
 lambda_cpg = args.lambda_cpg
 lambda_upa = args.lambda_upa
 print("Lambda for MFE:", lambda1)
 print("Lambda for CAI:", lambda2)
 print("Lambda for GC content:", lambda_gc)
-print("Lambda for CPB:", lambda_cpb)
-print("Lambda for liver:", lambda_liver)
-print("Lambda for Hepatocellular:", lambda_hepatocellular)
 print("Lambda for mRFP:", lambda_mRFP)
 print("Lambda for CpG:", lambda_cpg)
 print("Lambda for UpA:", lambda_upa)
 batch_size = args.batch_size
 single_example = args.single_example
 print("Single example: ", single_example)
+if single_example:
+    batch_size = 2
 input_example = args.input_example
 print("Input example: ", input_example)
 save_dir = args.save_dir

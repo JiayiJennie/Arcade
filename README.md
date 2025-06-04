@@ -41,11 +41,15 @@ Arcade/
 We provide a checkpoint with a token classification head, along with precomputed steering vectors.
 
 ### Codon Design with Different Targets
+```bash
+cd checkpoint
+wget https://cdn.prod.accelerator.sanofi/llm/CodonBERT.zip
+unzip CodonBERT.zip
+sed -i 's|"base_model_name_or_path": *".*"|"base_model_name_or_path": "'"$(realpath arcade/codonbert)"'"|g' arcade/adapter_config.json
+```
 
 ```bash
-cd scripts
-```
-```bash
+cd ../scripts
 CUDA_VISIBLE_DEVICES=0 python -u recons_token_cls.py \
   --lambda_cai 1 \
   --save_file_name 'cai' 
@@ -62,7 +66,7 @@ CUDA_VISIBLE_DEVICES=0 python -u recons_token_cls.py \
 If you only want to see one sequence:
 ```bash
 CUDA_VISIBLE_DEVICES=0 python -u recons_token_cls.py \
-  --lambda_gc 0 \
+  --lambda_gc 1 \
   --single_example \
   --input_example ATGCCA
 ```
@@ -87,7 +91,7 @@ CUDA_VISIBLE_DEVICES=0 python scripts/fetch_steering_vectors.py \
   --data_type fasta \
   --high_fa_path data/for_steering/high_gc.fa \
   --low_fa_path data/for_steering/low_gc.fa \
-  --model_path checkpoint \
+  --model_path checkpoint/arcade \
   --save_name 'gc' \
   --save_dir data/steering_vectors
 ```
