@@ -72,6 +72,7 @@ If you want to use your own data and base model to get started, you can train th
 ### Fine-Tune Token Classification Model
 
 ```bash
+CUDA_VISIBLE_DEVICES=0 python scripts/finetune_token_cls.py
   --model_path path/to/downloaded/base/model (e.g., CodonBERT checkpoints) \
   --data_path path/to/your/training/data \
   --use_lora
@@ -82,7 +83,7 @@ If you want to use your own data and base model to get started, you can train th
 This script computes **steering vectors** between two groups of mutated sequences (e.g., high vs. low expression) using a frozen CodonBERT model.
 
 ```bash
-python scripts/fetch_steering_vectors.py \
+CUDA_VISIBLE_DEVICES=0 python scripts/fetch_steering_vectors.py \
   --data_type fasta \
   --high_fa_path data/for_steering/high_gc.fa \
   --low_fa_path data/for_steering/low_gc.fa \
