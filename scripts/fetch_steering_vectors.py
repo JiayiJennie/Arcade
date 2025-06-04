@@ -1,6 +1,7 @@
 """
 This script fetches the steering vectors for sequences.
 """
+import argparse
 from Bio import SeqIO
 import sys
 import torch
@@ -22,31 +23,21 @@ def encode_sequences(sequences, tokenizer, max_length=1024):
     input_ids = tokenizer(tokenized_sequences, padding="max_length", truncation=True, max_length=max_length, return_tensors='pt').input_ids
     return input_ids
 
-def fetch_steering_vector(data_type, model, tokenizer, device, sequences=None, percent=None, min_seq_len=300, max_seq_len=3072-6, top_cai_threshold=0.4, \
-                          bottom_cai_threshold=0.2, lambda_=None, high_fa_path=None, low_fa_path=None):
+def fetch_steering_vector(data_type, model, tokenizer, device, sequences=None, percent=None, min_seq_len=300, max_seq_len=3072-6, \
+                          lambda_=None, high_fa_path=None, low_fa_path=None):
     """
     Visualize sequence embeddings colored by MFE or CAI values.
     
     Args:
         data_type (str): Type of data to analyze - 'mfe' or 'cai'
     """
-    # Read CSV file
-    if data_type.lower() == 'mfe' or data_type.lower() == 'cai' or data_type.lower() == 'mfe_cai':
-        assert sequences is not None and mfe_cai_table_path is not None
-        sequences = load_data(data_path)
-        print(f"Loaded {len(sequences)} sequences") 
-        df = pd.read_csv(mfe_cai_table_path)
-        df['MFE_normalized'] = df['MFE'] / df['Length']
-        df['log_CAI'] = np.log(df['CAI'])
-    else:
-        pass
 
     if data_type.lower() == 'mfe':
         value_col = 'MFE_normalized'
     elif data_type.lower() == 'cai':
         value_col = 'CAI'
     elif data_type.lower() == 'mfe_cai':
-        value_col = 'score'  #TODO: change this to the correct column name
+        value_col = 'score' 
         if lambda_ is None:
             raise ValueError("Must provide 'lambda_' for 'mfe_cai' data type.")
         # df['score'] = - df['MFE_normalized'] + lambda_ * df['CAI']
@@ -77,12 +68,6 @@ def fetch_steering_vector(data_type, model, tokenizer, device, sequences=None, p
 
         low_seqs = bottom_seqs['ID'].values
         low_seqs = [sequences[seq] for seq in low_seqs]
-    # elif top_cai_threshold is not None and data_type.lower() == 'cai':
-    #     # Select based on absolute CAI threshold
-    #     top_seqs = df[df['CAI'] >= top_cai_threshold]
-    #     bottom_seqs = df[df['CAI'] <= bottom_cai_threshold]
-    #     print(f"Number of top sequences: {len(top_seqs)}")
-    #     print(f"Number of bottom sequences: {len(bottom_seqs)}")
     else:
         raise ValueError("Must provide either 'percent' or 'cai_threshold' (only for 'cai').")
 
@@ -140,13 +125,21 @@ def load_data(data_path):
     return sequences
 
 if __name__ == "__main__":
-    lambda_ = 0
-    percent = 0.01
-    high_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/for_steering/high_upa.fa'
-    low_fa_path = '/mnt/disk90/user/jiayili/codon_optimization_steering/data/for_steering/low_upa.fa'
-    save_name = 'upa'
-    data_type = 'fasta'
-    save_dir = '/mnt/disk90/user/jiayili/codon_optimization_steering/data'
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--model_path', type=str, default=model_path, help='Path to the PEFT model checkpoint.')
+    parser.add_argument('--high_fa_path', type=str, default=None, help='Path to the high value FASTA file.')
+    parser.add_argument('--low_fa_path', type=str, default=None, help='Path to the low value FASTA file.')
+    parser.add_argument('--data_type', type=str, default='fasta', help='Type of data to analyze.')
+    parser.add_argument('--save_name', type=str, default=None, help='Name to save the steering vectors.')
+    parser.add_argument('--save_dir', type=str, default='../data', help='Directory to save the steering vectors.')
+    args = parser.parse_args()
+
+    model_path = args.model_path
+    high_fa_path = args.high_fa_path
+    low_fa_path = args.low_fa_path
+    data_type = args.data_type.lower()
+    save_name = args.save_name 
+    save_dir = args.save_dir
 
     tokenizer = get_tokenizer()
     device = torch.device("cuda:0")
