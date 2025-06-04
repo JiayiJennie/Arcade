@@ -17,7 +17,7 @@ You can install dependencies in one of two ways:
 pip install -r requirements.txt
 ```
 
-**Option 2: Using Poetry** (TODO)
+**Option 2: Using Poetry (TODO)** 
 Dependency management can also be done via [Poetry](https://python-poetry.org/).  
 This project extends the setup from the original CodonBERT repository, with updated dependencies defined in `pyproject.toml`:
 
