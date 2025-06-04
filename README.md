@@ -32,6 +32,8 @@ Arcade/
     ├── fetch_steering_vectors.py   # script for making steering vectors
 ├── data/                  # Data for finetuning and steering vectors
 ├── checkpoints/           # fine-tuned models
+    ├── arcade/            # Arcade checkpoint
+    ├── codonbert/         # CodonBERT checkpoint
 ├── results/               # Model outputs
 ├── calculator/            # Calculator for metrics (e.g. CAI, MFE, GC content)
 ``` 
