@@ -29,7 +29,7 @@ Arcade/
 ├── scripts/               # Main scripts 
     ├── recons_token_cls.py         # script for codon design
     ├── finetune_token_cls.py       # script for finetuning the pretrained base model with token classification head
-    ├── fetch_steering_vectors      # script for making steering vectors
+    ├── fetch_steering_vectors.py   # script for making steering vectors
 ├── data/                  # Data for finetuning and steering vectors
 ├── checkpoints/           # fine-tuned models
 ├── outputs/               # Model outputs
@@ -86,7 +86,7 @@ python scripts/fetch_steering_vectors.py \
   --high_fa_path data/for_steering/high_gc.fa \
   --low_fa_path data/for_steering/low_gc.fa \
   --model_path checkpoint \
-  --save_name gc \
+  --save_name 'gc' \
   --save_dir data/steering_vectors
 ```
 
