@@ -10,9 +10,16 @@ We recommend starting from a clean Conda environment:
 conda create -n arcade python=3.10
 conda activate arcade
 ```
+You can install dependencies in one of two ways:
 
-Dependency management is handled via [Poetry](https://python-poetry.org/).  
-This project extends the setup from the original CodonBERT repository, with updated dependencies and features in our own `pyproject.toml`:
+**Option 1: Using pip and a `requirements.txt` file**
+```bash
+pip install -r requirements.txt
+```
+
+**Option 2: Using Poetry** (TODO)
+Dependency management can also be done via [Poetry](https://python-poetry.org/).  
+This project extends the setup from the original CodonBERT repository, with updated dependencies defined in `pyproject.toml`:
 
 ```bash
 pip install poetry
