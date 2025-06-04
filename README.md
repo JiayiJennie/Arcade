@@ -4,8 +4,17 @@ This repository extends CodonBERT[*CodonBERT: large language models for mRNA des
 
 ### Environment Setup
 
-Dependency management is done via [poetry](https://python-poetry.org/).
+We recommend starting from a clean Conda environment:
+
+```bash
+conda create -n arcade python=3.10
+conda activate arcade
 ```
+
+Dependency management is handled via [Poetry](https://python-poetry.org/).  
+This project extends the setup from the original CodonBERT repository, with updated dependencies and features in our own `pyproject.toml`:
+
+```bash
 pip install poetry
 poetry install
 ```
