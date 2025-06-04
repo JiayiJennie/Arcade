@@ -16,8 +16,6 @@ import os
 sys.path.append("/mnt/disk90/user/jiayili/CodonBERT/benchmarks/utils")
 from tokenizer import mytok, get_tokenizer
 
-model_path = '../chckpoints'
-
 def encode_sequences(sequences, tokenizer, max_length=1024):
     tokenized_sequences = [" ".join(mytok(seq, 3, 3)) for seq in sequences]
     input_ids = tokenizer(tokenized_sequences, padding="max_length", truncation=True, max_length=max_length, return_tensors='pt').input_ids
