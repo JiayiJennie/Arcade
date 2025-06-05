@@ -63,7 +63,7 @@ We provide a checkpoint with a token classification head, along with precomputed
 cd checkpoint
 wget https://cdn.prod.accelerator.sanofi/llm/CodonBERT.zip
 unzip CodonBERT.zip
-sed -i 's|"base_model_name_or_path": *".*"|"base_model_name_or_path": "'"$(realpath arcade/codonbert)"'"|g' arcade/adapter_config.json
+sed -i 's|"base_model_name_or_path": *".*"|"base_model_name_or_path": "'"$(realpath arcade/)"'"|g' arcade/adapter_config.json
 ```
 
 ```bash
