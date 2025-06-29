@@ -233,9 +233,9 @@ pred_labels = predictions.metrics["test_predictions"]
 
 
 if single_example:
-    table = '/mnt/disk90/user/jiayili/calculator/data/codon_adaptiveness.json'
-    mtable = '/mnt/disk90/user/jiayili/calculator/data/max_codon_adaptiveness.json'
-    cps_table_path = '/mnt/disk90/user/jiayili/calculator/CPS/codon_pair_scores_homo_sapiens.csv'
+    table = os.path.abspath('../calculator/data/codon_adaptiveness.json')
+    mtable = os.path.abspath('../calculator/data/max_codon_adaptiveness.json')
+    cps_table_path = os.path.abspath('../calculator/CPS/codon_pair_scores_homo_sapiens.csv')
 
     seq_index = 0  #2,3,4
     input = tokenized_test["seq"][seq_index].split(" ")
