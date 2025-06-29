@@ -4,8 +4,11 @@ from transformers import (
     )
 from Bio import SeqIO
 
-import sys
-sys.path.append("/mnt/disk90/user/jiayili/CodonBERT_sanofi/benchmarks/utils")
+import sys, os
+# print('hi',os.path.abspath('../../benchmarks/utils'))
+# assert 1==0
+sys.path.append(os.path.abspath('../benchmarks/utils'))
+# sys.path.append("/mnt/disk90/user/jiayili/CodonBERT_sanofi/benchmarks/utils")
 from tokenizer import get_tokenizer, mytok
 
 def tokenize_and_align_labels(examples, bert_tokenizer_fast, label2id, max_length=1024):
