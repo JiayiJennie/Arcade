@@ -1,6 +1,7 @@
 # Arcade: Activation Engineering for Controllable Codon Design
 
-This repository extends CodonBERT[*CodonBERT: large language models for mRNA design and optimization*](https://www.biorxiv.org/content/10.1101/2023.09.09.556981v1) with our framework — Arcade — for controllable codon design using activation engineering and semantic steering.
+Arcade is a framework for controllable codon design with flexible optimization targets like MFE (Minimum Free Energy), CAI (Codon Adaptation Index), GC content, and specific gene expression levels, etc.
+
 
 ### Environment Setup
 
@@ -29,8 +30,8 @@ Ensure you have CUDA drivers if you plan on using a GPU.
 
 ### Download Pretrained Model CodonBERT
 
-The CodonBERT Pytorch model can be downloaded [here](https://cdn.prod.accelerator.sanofi/llm/CodonBERT.zip). The artifact is under a [license](ARTIFACT_LICENSE.md).
-The code and repository are under a [software license](SOFTWARE_LICENSE.md).
+We use the CodonBERT Pytorch model can be downloaded [here](https://cdn.prod.accelerator.sanofi/llm/CodonBERT.zip) from repository CodonBERT[*CodonBERT: large language models for mRNA design and optimization*](https://www.biorxiv.org/content/10.1101/2023.09.09.556981v1).\
+The artifact is under a [license](ARTIFACT_LICENSE.md). The code and repository are under a [software license](SOFTWARE_LICENSE.md).
 
 ## Arcade
 Arcade (Activation Engineering for Controllable Codon Design) builds on CodonBERT and introduces a framework for:
@@ -120,3 +121,8 @@ CUDA_VISIBLE_DEVICES=0 python scripts/fetch_steering_vectors.py \
   --save_dir data/steering_vectors
 ```
 
+---
+
+## License
+
+This project is licensed under the [ARCADE Software License Agreement](licence.txt). 
